@@ -9,25 +9,51 @@ const ruleTester = new TSESLint.RuleTester({
   }
 })
 
+jest.mock('../../src/utils/cwd', () => ({
+  cwd: () => '/project' // Project root
+}))
+
 describe("enforce absolute path", () => {
 
   ruleTester.run('distance-absolute', rule, {
     valid: [
       {
-        code: "import foo from './foo.js';",
+        code: "import foo from './foo';",
         filename: '/project/src/bar.js'
       },
       {
-        code: "import foo from '../foo.js';",
+        code: "import foo from '../foo';",
         filename: '/project/src/sub/bar.js'
       },
       {
-        code: "import foo from '../../foo.js';",
+        code: "import foo from '../../foo';",
         filename: '/project/src/sub/sub/bar.js'
       },
       {
-        code: "import foo from '/project/foo.js';",
+        code: "import foo from 'foo';",
         filename: '/project/src/bar.js'
+      },
+      {
+        code: "import foo from 'src/foo';",
+        filename: '/project/src/bar.js',
+        options: [{
+          ignoreTopLevel: 2
+        }]
+      },
+      {
+        code: "import foo from 'src/foo';",
+        filename: '/project/src/sub/bar.js',
+        options: [{
+          ignoreTopLevel: 3
+        }]
+      },
+      {
+        code: "import foo from 'foo';",
+        filename: '/project/src/sub/bar.js',
+        options: [{
+          ignoreTopLevel: 3,
+          rootDir: "src"
+        }]
       }
     ],
 
@@ -36,14 +62,42 @@ describe("enforce absolute path", () => {
         code: "import foo from '../../../foo.js';",
         filename: '/project/src/sub/sub/bar.js',
         errors: [{messageId: 'pathEnforce'}],
-        output: "import foo from '/project/foo.js';"
+        output: "import foo from 'src/foo.js';"
       },
       {
-        code: "import foo from '../../../../foo.js';",
+        code: "import foo from '../../../foo.js';",
         filename: '/project/src/sub/sub/sub/bar.js',
         errors: [{messageId: 'pathEnforce'}],
-        output: "import foo from '/project/foo.js';"
-      }
+        output: "import foo from 'src/sub/foo.js';"
+      },
+      {
+        code: "import foo from '../foo.js';",
+        filename: '/project/src/sub/bar.js',
+        errors: [{messageId: 'pathEnforce'}],
+        output: "import foo from 'src/sub/foo.js';",
+        options: [{
+          maxDepth: 1
+        }]
+      },
+      {
+        code: "import foo from '../../foo.js';",
+        filename: '/project/src/sub/bar.js',
+        errors: [{messageId: 'pathEnforce'}],
+        output: "import foo from 'src/foo.js';",
+        options: [{
+          maxDepth: 2
+        }]
+      },
+      {
+        code: "import foo from '../../foo.js';",
+        filename: '/project/src/sub/bar.js',
+        errors: [{messageId: 'pathEnforce'}],
+        output: "import foo from 'foo.js';",
+        options: [{
+          maxDepth: 2,
+          rootDir: "src"
+        }]
+      },
     ]
   })
 
@@ -53,42 +107,71 @@ describe("enforce relative path", () => {
   ruleTester.run('proximity-relative', rule, {
     valid: [
       {
-        code: "import foo from './foo.js';",
+        code: "import foo from './foo';",
         filename: '/project/src/bar.js'
       },
       {
-        code: "import foo from '../foo.js';",
+        code: "import foo from '../foo';",
         filename: '/project/src/sub/bar.js'
       },
       {
-        code: "import foo from '../../foo.js';",
+        code: "import foo from '../../foo';",
         filename: '/project/src/sub/sub/bar.js'
       },
       {
-        code: "import foo from '/foo.js';",
+        code: "import foo from 'foo';",
         filename: '/project/src/sub/sub/bar.js'
-      }
+      },
+      {
+        code: "import foo from 'foo';",
+        filename: '/project/src/sub/sub/bar.js',
+        options: [{
+          rootDir: "src"
+        }]
+      },
     ],
 
     invalid: [
       {
-        code: "import foo from '/project/src/sub/sub/foo.js';",
+        code: "import foo from 'src/sub/sub/foo.js';",
         filename: '/project/src/sub/sub/bar.js',
         errors: [{ messageId: 'pathEnforce' }],
         output: "import foo from './foo.js';"
       },
       {
-        code: "import foo from '/project/src/sub/foo.js';",
+        code: "import foo from 'src/sub/foo.js';",
         filename: '/project/src/sub/sub/bar.js',
         errors: [{ messageId: 'pathEnforce' }],
         output: "import foo from '../foo.js';"
       },
       {
-        code: "import foo from '/project/src/foo.js';",
-        filename: '/project/src/sub/sub/bar.js',
+        code: "import foo from 'src/foo.js';",
+        filename: '/project/src/sub/bar.js',
+        errors: [{messageId: 'pathEnforce'}],
+        output: "import foo from '../foo.js';",
+        options: [{
+          ignoreTopLevel: 1
+        }]
+      },
+      {
+        code: "import foo from 'src/foo.js';",
+        filename: '/project/src/bar.js',
         errors: [{ messageId: 'pathEnforce' }],
-        output: "import foo from '../../foo.js';"
-      }
+        output: "import foo from './foo.js';",
+        options: [{
+          ignoreTopLevel: 1
+        }]
+      },
+      {
+        code: "import foo from 'sub/foo';",
+        filename: '/project/src/sub/sub/bar.js',
+        errors: [{messageId: 'pathEnforce'}],
+        output: "import foo from '../foo';",
+        options: [{
+          ignoreTopLevel: 1,
+          rootDir: "src"
+        }]
+      },
     ]
   })
 

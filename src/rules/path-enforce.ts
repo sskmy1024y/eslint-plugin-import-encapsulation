@@ -1,17 +1,11 @@
 import { TSESLint, TSESTree } from '@typescript-eslint/experimental-utils'
-import * as path from 'path'
-import {getDirectoryLevel} from "../utils/getDirectoryLevel";
-import { isProximityRelationship } from '../utils/isProximityRelationship'
+import {Target} from "../entities/Target";
+import {Options} from "../types/options";
 import { safeReplace } from '../utils/safeReplace'
 
 const pathEnforce: TSESLint.RuleModule<
   'pathEnforce',
-  [
-    {
-      maxDepth: number,
-      ignoreTopLevel: number
-    },
-  ]
+  [Options]
 > = {
   meta: {
     type: 'suggestion',
@@ -31,6 +25,14 @@ const pathEnforce: TSESLint.RuleModule<
           ignoreTopLevel: {
             type: 'integer',
             minimum: 1
+          },
+          rootDir: {
+            type: 'string',
+            default: ''
+          },
+          prefix: {
+            type: 'string',
+            default: ''
           }
         },
         additionalProperties: false
@@ -42,33 +44,23 @@ const pathEnforce: TSESLint.RuleModule<
   },
 
   create(context): TSESLint.RuleListener {
-    const options = context.options[0] || {}
-    const maxDepth = options.maxDepth || 3
-    const ignoreTopLevel = options.ignoreTopLevel || 2
-
     const checkImportPath: TSESLint.RuleFunction<TSESTree.ImportDeclaration> = (node) => {
-      const filePath = context.getFilename()
-      const sourcePath = node.source.value as string
-      const importPath = path.resolve(path.dirname(filePath), sourcePath)
-      const isAbsolutePath = path.isAbsolute(sourcePath)
-      const outsideIgnoreTopLevel = getDirectoryLevel(sourcePath) > ignoreTopLevel + 1 // NOTE: +1 is the root directory
+      const target = new Target(context, node.source.value)
 
-      // NOTE: If using a relativePath even though they are far apart, make it absolutePath.
-      if (!isAbsolutePath && !isProximityRelationship(filePath, importPath, maxDepth)) {
+      if (target.isRelative && !target.isProximityRelationship) {
         context.report({
           node: node.source,
           messageId: 'pathEnforce',
           fix(fixer) {
-            return safeReplace(fixer, node.source, importPath)
+            return safeReplace(fixer, node.source, target.importAbsolutePath)
           }
         })
-      } else if (isAbsolutePath && isProximityRelationship(filePath, importPath, maxDepth) && outsideIgnoreTopLevel) {
+      } else if (!target.isRelative && target.isProximityRelationship && target.isOutsideTopLevel) {
         context.report({
           node: node.source,
           messageId: 'pathEnforce',
           fix(fixer) {
-            const newImportPath = path.relative(path.dirname(filePath), importPath)
-            return safeReplace(fixer, node.source, newImportPath.startsWith('.') ? newImportPath : `./${newImportPath}`)
+            return safeReplace(fixer, node.source, target.importRelativePath)
           }
         })
       }
@@ -81,7 +73,9 @@ const pathEnforce: TSESLint.RuleModule<
   defaultOptions: [
     {
       maxDepth: 3,
-      ignoreTopLevel: 2
+      ignoreTopLevel: 2,
+      rootDir: '',
+      prefix: ''
     },
   ]
 }
