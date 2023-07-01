@@ -111,6 +111,15 @@ describe("enforce absolute path", () => {
           rootDir: "src"
         }]
       },
+      {
+        code: "import foo from './sub/sub/sub/foo.js';",
+        filename: '/project/src/sub/bar.js',
+        errors: [{messageId: 'pathEnforce'}],
+        output: "import foo from 'src/sub/sub/sub/sub/foo.js';",
+        options: [{
+          maxDepth: 1
+        }]
+      },
     ]
   })
 
