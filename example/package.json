@@ -1,0 +1,17 @@
+{
+  "name": "example",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@types/node": "^16.11.56",
+    "eslint-plugin-import-access": "^1.0.2",
+    "eslint-plugin-import-encapsulation": "link:../",
+    "typescript": "^4.8.2"
+  },
+  "scripts": {
+    "eslint": "eslint src --ext .js,.jsx,.ts,.tsx --config .eslintrc"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.60.1"
+  }
+}

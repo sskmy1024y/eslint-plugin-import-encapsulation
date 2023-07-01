@@ -1,5 +1,5 @@
 import { TSESLint } from '@typescript-eslint/experimental-utils'
-import rule from '../../src/rules/path-enforce'
+import rule from '../../src/rules/encapsulation'
 
 const ruleTester = new TSESLint.RuleTester({
   parser: require.resolve('espree'),
@@ -59,29 +59,17 @@ describe("enforce absolute path", () => {
 
     invalid: [
       {
-        code: "import foo from '../../../foo.js';",
-        filename: '/project/src/sub/sub/bar.js',
-        errors: [{messageId: 'pathEnforce'}],
-        output: "import foo from 'src/foo.js';"
-      },
-      {
-        code: "import foo from '../../../foo.js';",
-        filename: '/project/src/sub/sub/sub/bar.js',
-        errors: [{messageId: 'pathEnforce'}],
-        output: "import foo from 'src/sub/foo.js';"
-      },
-      {
         code: "import foo from '../foo.js';",
         filename: '/project/src/sub/bar.js',
         errors: [{messageId: 'pathEnforce'}],
-        output: "import foo from 'src/sub/foo.js';",
+        output: "import foo from 'src/foo.js';",
         options: [{
           maxDepth: 1
         }]
       },
       {
         code: "import foo from '../../foo.js';",
-        filename: '/project/src/sub/bar.js',
+        filename: '/project/src/sub/sub/bar.js',
         errors: [{messageId: 'pathEnforce'}],
         output: "import foo from 'src/foo.js';",
         options: [{
@@ -89,8 +77,33 @@ describe("enforce absolute path", () => {
         }]
       },
       {
+        code: "import foo from '../../../foo.js';",
+        filename: '/project/src/sub/sub/sub/bar.js',
+        errors: [{messageId: 'pathEnforce'}],
+        output: "import foo from 'src/foo.js';"
+      },
+      {
         code: "import foo from '../../foo.js';",
         filename: '/project/src/sub/bar.js',
+        errors: [{messageId: 'pathEnforce'}],
+        output: "import foo from 'foo.js';",
+        options: [{
+          maxDepth: 2
+        }]
+      },
+      {
+        code: "import foo from '../../foo.js';",
+        filename: '/project/src/sub/sub/bar.js',
+        errors: [{messageId: 'pathEnforce'}],
+        output: "import foo from 'foo.js';",
+        options: [{
+          maxDepth: 2,
+          rootDir: "src"
+        }]
+      },
+      {
+        code: "import foo from '../../../foo.js';",
+        filename: '/project/src/modules/moduleA/moduleB/moduleB.js',
         errors: [{messageId: 'pathEnforce'}],
         output: "import foo from 'foo.js';",
         options: [{

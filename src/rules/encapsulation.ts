@@ -1,9 +1,9 @@
 import { TSESLint, TSESTree } from '@typescript-eslint/experimental-utils'
 import {Target} from "../entities/Target";
-import {Options} from "../types/options";
+import type {Options} from "../types/Options";
 import { safeReplace } from '../utils/safeReplace'
 
-const pathEnforce: TSESLint.RuleModule<
+const encapsulation: TSESLint.RuleModule<
   'pathEnforce',
   [Options]
 > = {
@@ -80,4 +80,4 @@ const pathEnforce: TSESLint.RuleModule<
   ]
 }
 
-export default pathEnforce
+export default encapsulation

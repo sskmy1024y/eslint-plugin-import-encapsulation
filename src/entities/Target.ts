@@ -23,7 +23,7 @@ export class Target {
   }
 
   get importFilePath(): string {
-    return this.isRelative ? path.resolve(this.filePath, this.importSourcePath) : path.resolve(this.projectRoot, this.importSourcePath)
+    return this.isRelative ? path.resolve(path.dirname(this.filePath), this.importSourcePath) : path.resolve(this.projectRoot, this.importSourcePath)
   }
 
   get isRelative(): boolean {
@@ -36,10 +36,11 @@ export class Target {
 
   get isProximityRelationship(): boolean {
     const depth = path.relative(path.dirname(this.filePath), this.importFilePath).split(path.sep).length
-    return depth < this.maxDepth
+    return depth <= this.maxDepth
   }
 
   get importAbsolutePath(): string {
+    console.log("absolute", this.projectRoot, this.importFilePath, path.relative(this.projectRoot, this.importFilePath))
     return path.relative(this.projectRoot, this.importFilePath)
   }
 

@@ -2,23 +2,23 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "outDir": "./dist",
-    "baseUrl": "./src",
     "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
+    "isolatedModules": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "declarationDir": "./dist",
+    "baseUrl": "./src",
+    "plugins": [
+      {
+        "name": "eslint-plugin-import-access"
+      }
+    ]
   },
   "include": [
-    "src/index.ts",
-    "__tests__/**/*"
+    "src"
   ],
   "exclude": [
-    "node_modules",
-    "dist",
-    "example"
+    "node_modules"
   ]
 }
