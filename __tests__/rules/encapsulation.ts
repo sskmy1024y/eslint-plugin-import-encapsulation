@@ -198,3 +198,25 @@ describe("enforce relative path", () => {
   })
 
 })
+
+
+ruleTester.run('ignore node_modules', rule, {
+  valid: [
+    {
+      code: "import { TSESLint, TSESTree } from '@typescript-eslint/experimental-utils'",
+      filename: '/project/src/sub/bar.js',
+      options: [{
+        maxDepth: 1,
+        ignoreTopLevel: 1
+      }]
+    },
+    {
+      code: "import { RuleModule } from '@typescript-eslint/utils/dist/ts-eslint'",
+      filename: '/project/src/sub/bar.js',
+      options: [{
+        maxDepth: 1
+      }]
+    },
+  ],
+  invalid: []
+})

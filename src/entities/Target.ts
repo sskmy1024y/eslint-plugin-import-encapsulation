@@ -49,6 +49,15 @@ export class Target {
     return relativePath.startsWith('.') ? relativePath : `./${relativePath}`
   }
 
+  get isNodeModule(): boolean {
+    try {
+      const modulePath = require.resolve(this._importSourcePath)
+      return modulePath.includes(path.join('node_modules', this._importSourcePath))
+    } catch {
+      return false
+    }
+  }
+
   // ---------------------------------
   // private
   // ---------------------------------
@@ -80,15 +89,5 @@ export class Target {
 
   private get projectRoot(): string {
     return `${cwd(this._context)}${this.rootDir !== '' ? path.sep + this.rootDir : ''}`
-  }
-
-  private getProjectAbsolutePath(filePath: string): string {
-    return [
-      this.prefix,
-      ...path.relative(
-        this.projectRoot,
-        path.join(path.dirname(this.filePath), filePath)
-      ).split(path.sep)
-    ].filter(String).join("/")
   }
 }

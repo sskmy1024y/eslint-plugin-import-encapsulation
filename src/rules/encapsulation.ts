@@ -47,6 +47,9 @@ const encapsulation: TSESLint.RuleModule<
     const checkImportPath: TSESLint.RuleFunction<TSESTree.ImportDeclaration> = (node) => {
       const target = new Target(context, node.source.value)
 
+      // NOTE: ignore node_modules
+      if (target.isNodeModule) return
+
       if (target.isRelative && !target.isProximityRelationship) {
         context.report({
           node: node.source,
