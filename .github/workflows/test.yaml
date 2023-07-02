@@ -7,11 +7,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        command: [
+          'yarn lint'
+          'yarn test'
+        ]
+    env:
+      command: ${{ matrix.command }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '16.x'
           cache: yarn
-      - run: yarn install
-      - run: yarn test
+      - run: $command
+        working-directory: .

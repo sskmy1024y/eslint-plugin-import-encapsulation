@@ -1,12 +1,9 @@
-import { TSESLint, TSESTree } from '@typescript-eslint/experimental-utils'
-import {Target} from "../entities/Target";
-import type {Options} from "../types/Options";
-import { safeReplace } from '../utils/safeReplace'
+import { TSESLint, TSESTree } from '@typescript-eslint/experimental-utils';
+import { Target } from '../entities/Target';
+import type { Options } from '../types/Options';
+import { safeReplace } from '../utils/safeReplace';
 
-const encapsulation: TSESLint.RuleModule<
-  'pathEnforce',
-  [Options]
-> = {
+const encapsulation: TSESLint.RuleModule<'pathEnforce', [Options]> = {
   meta: {
     type: 'suggestion',
     docs: {
@@ -45,33 +42,33 @@ const encapsulation: TSESLint.RuleModule<
 
   create(context): TSESLint.RuleListener {
     const checkImportPath: TSESLint.RuleFunction<TSESTree.ImportDeclaration> = (node) => {
-      const target = new Target(context, node.source.value)
+      const target = new Target(context, node.source.value);
 
       // NOTE: ignore node_modules
-      if (target.isNodeModule) return
+      if (target.isNodeModule) return;
 
       if (target.isRelative && !target.isProximityRelationship) {
         context.report({
           node: node.source,
           messageId: 'pathEnforce',
           fix(fixer) {
-            return safeReplace(fixer, node.source, target.importAbsolutePath)
+            return safeReplace(fixer, node.source, target.importAbsolutePath);
           }
-        })
+        });
       } else if (!target.isRelative && target.isProximityRelationship && target.isOutsideTopLevel) {
         context.report({
           node: node.source,
           messageId: 'pathEnforce',
           fix(fixer) {
-            return safeReplace(fixer, node.source, target.importRelativePath)
+            return safeReplace(fixer, node.source, target.importRelativePath);
           }
-        })
+        });
       }
-    }
+    };
 
     return {
       ImportDeclaration: checkImportPath
-    }
+    };
   },
   defaultOptions: [
     {
@@ -79,8 +76,8 @@ const encapsulation: TSESLint.RuleModule<
       ignoreTopLevel: 2,
       rootDir: '',
       prefix: ''
-    },
+    }
   ]
-}
+};
 
-export default encapsulation
+export default encapsulation;
