@@ -23,5 +23,6 @@ jobs:
         with:
           node-version: '16.x'
           cache: yarn
+      - run: yarn install
       - run: $command
         working-directory: .
