@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-import-encapsulation",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "This plugin provides rules to enforce the best import path for encapsulation",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.es.js",
