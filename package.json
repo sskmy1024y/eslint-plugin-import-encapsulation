@@ -33,8 +33,7 @@
   "author": "sho",
   "license": "MIT",
   "dependencies": {
-    "eslint": "^8.43.0",
-    "remove": "^0.1.5"
+    "eslint": "^8.43.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.22.5",
