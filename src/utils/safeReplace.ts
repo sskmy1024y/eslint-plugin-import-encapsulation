@@ -1,4 +1,4 @@
-import { TSESLint, TSESTree } from '@typescript-eslint/experimental-utils'
+import { TSESLint, TSESTree } from '@typescript-eslint/experimental-utils';
 
 /**
  * Safely replaces the contents of a StringLiteral node with a target string.
@@ -13,7 +13,7 @@ import { TSESLint, TSESTree } from '@typescript-eslint/experimental-utils'
  * The replacement preserves the original quote style to avoid potential syntax errors.
  */
 export const safeReplace = (fixer: TSESLint.RuleFixer, source: TSESTree.StringLiteral, target: string) => {
-  const quoteMatch = source.raw.match(/^(['"])/) // Use RegExp to match the first single or double quote
-  const originalQuote = quoteMatch ? quoteMatch[1] : '"' // If a match is found, use the matched quote; otherwise, default to double quotes
-  return fixer.replaceText(source, `${originalQuote}${target}${originalQuote}`)
-}
+  const quoteMatch = source.raw.match(/^(['"])/); // Use RegExp to match the first single or double quote
+  const originalQuote = quoteMatch ? quoteMatch[1] : '"'; // If a match is found, use the matched quote; otherwise, default to double quotes
+  return fixer.replaceText(source, `${originalQuote}${target}${originalQuote}`);
+};
