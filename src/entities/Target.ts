@@ -52,7 +52,7 @@ export class Target {
   get isNodeModule(): boolean {
     try {
       const modulePath = require.resolve(this._importSourcePath)
-      return modulePath.includes(path.join('node_modules', this._importSourcePath))
+      return !!modulePath
     } catch {
       return false
     }
